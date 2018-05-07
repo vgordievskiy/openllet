@@ -191,6 +191,11 @@ public class OpenlletOptions
 	public static boolean USE_CONTINUOUS_RULES = true;
 
 	/**
+	 * Should the ABox check for consistency, or you trust the user for input already consistent axioms set.
+	 */
+	public static boolean USE_CONSISTENCY = true;
+
+	/**
 	 * Always rebuild rete (no incremental update)
 	 */
 	public static boolean ALWAYS_REBUILD_RETE = false;
@@ -598,6 +603,8 @@ public class OpenlletOptions
 		RETURN_NON_PRIMITIVE_EQUIVALENT_PROPERTIES = getBooleanProperty(newOptions, "RETURN_NON_PRIMITIVE_EQUIVALENT_PROPERTIES", RETURN_NON_PRIMITIVE_EQUIVALENT_PROPERTIES, oldOptions);
 
 		USE_COMPLETION_QUEUE = getBooleanProperty(newOptions, "USE_COMPLETION_QUEUE", USE_COMPLETION_QUEUE, oldOptions);
+
+		USE_CONSISTENCY = getBooleanProperty(newOptions, "USE_CONSISTENCY", USE_CONSISTENCY, oldOptions);
 
 		USE_CONTINUOUS_RULES = getBooleanProperty(newOptions, "USE_CONTINUOUS_RULES", USE_CONTINUOUS_RULES, oldOptions);
 

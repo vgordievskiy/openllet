@@ -138,6 +138,7 @@ public class KnowledgeBaseImpl implements KnowledgeBase
 	protected final MultiValueMap<AssertionType, ATermAppl> _aboxAssertions = new MultiValueMap<>();
 	private final Set<ATermAppl> _individuals = SetUtils.create();
 	private final Map<ATermAppl, Map<ATermAppl, Set<ATermAppl>>> _annotations;
+	private boolean _consistencyComputed = false;
 
 	@Override
 	public Map<ATermAppl, Map<ATermAppl, Set<ATermAppl>>> getAnnotations()
@@ -1894,15 +1895,20 @@ public class KnowledgeBaseImpl implements KnowledgeBase
 	@Override
 	public void ensureConsistency()
 	{
-		if (!isConsistent())
-			throw new InconsistentOntologyException("Cannot do reasoning with inconsistent ontologies!\n"//
-					+ "Reason for inconsistency: " + getExplanation()//
-					+ (OpenlletOptions.USE_TRACING ? "\n" + renderExplanationSet() : ""));
+		if (OpenlletOptions.USE_CONSISTENCY || !_consistencyComputed)
+		{
+			if (!isConsistent())
+				throw new InconsistentOntologyException("Cannot do reasoning with inconsistent ontologies!\n"//
+						+ "Reason for inconsistency: " + getExplanation()//
+						+ (OpenlletOptions.USE_TRACING ? "\n" + renderExplanationSet() : ""));
+			_consistencyComputed = true;
+		}
 	}
 
 	@Override
 	public void classify()
 	{
+
 		ensureConsistency();
 
 		if (isClassified())
