@@ -54,6 +54,7 @@ public class GraphQueryHandler
 	@SuppressWarnings("unused")
 	private static final Node[] EMPTY = new Node[0];
 
+	private static Set<Node> BUILTIN_PREDICATES_FILTERS = new HashSet<>();
 	private static final Node[] BUILTIN_PREDICATES = new Node[] { //
 			RDF.type.asNode(), OWL.sameAs.asNode(), OWL.differentFrom.asNode(), //
 			RDFS.subClassOf.asNode(), OWL.equivalentClass.asNode(), OWL.complementOf.asNode(), OWL.disjointWith.asNode(), //
@@ -157,8 +158,12 @@ public class GraphQueryHandler
 			{
 				ExtendedIterator<Triple> builtinPredicates = NullIterator.instance();
 				if (!o.isLiteral() && !openllet.isSkipBuiltinPredicates())
-					for (final Node pred : BUILTIN_PREDICATES)
-						builtinPredicates = builtinPredicates.andThen(findTriple(kb, openllet, s, pred, o));
+					for (final Node pred : BUILTIN_PREDICATES) {
+						if (!isFilteredBuiltin(pred)) {
+							builtinPredicates = builtinPredicates.andThen(findTriple(kb, openllet, s, pred, o));
+						}
+					}
+
 
 				final ExtendedIterator<Triple> propertyAssertions = WrappedIterator.create(new NestedIterator<ATermAppl, Triple>(kb.getProperties())
 				{
@@ -189,8 +194,11 @@ public class GraphQueryHandler
 			{
 				ExtendedIterator<Triple> builtinPredicates = NullIterator.instance();
 				if (!openllet.isSkipBuiltinPredicates())
-					for (final Node pred : BUILTIN_PREDICATES)
-						builtinPredicates = builtinPredicates.andThen(findTriple(kb, openllet, s, pred, o));
+					for (final Node pred : BUILTIN_PREDICATES) {
+						if (!isFilteredBuiltin(pred)) {
+							builtinPredicates = builtinPredicates.andThen(findTriple(kb, openllet, s, pred, o));
+						}
+					}
 
 				final ExtendedIterator<Triple> propertyAssertions = WrappedIterator.create(new NestedIterator<ATermAppl, Triple>(kb.getProperties())
 				{
@@ -241,8 +249,11 @@ public class GraphQueryHandler
 				}
 				else
 					if (!openllet.isSkipBuiltinPredicates())
-						for (final Node pred : BUILTIN_PREDICATES)
-							result = result.andThen(findTriple(kb, openllet, s, pred, o));
+						for (final Node pred : BUILTIN_PREDICATES) {
+							if (!isFilteredBuiltin(pred)) {
+								result = result.andThen(findTriple(kb, openllet, s, pred, o));
+							}
+						}
 				return result;
 			}
 		});
@@ -1534,6 +1545,13 @@ public class GraphQueryHandler
 	public static boolean isBuiltin(final Node node)
 	{
 		return BUILTIN_KEYWORDS.contains(node);
+	}
+
+	public static boolean isFilteredBuiltin(final Node node) { return BUILTIN_PREDICATES_FILTERS.contains(node); }
+
+	public static Set<Node> getBuiltinPredicatesFilters() { return BUILTIN_PREDICATES_FILTERS; }
+	public static void setBuiltinFilters(final Set<Node> nodes) {
+		BUILTIN_PREDICATES_FILTERS = nodes;
 	}
 
 	public static Node normalize(final Node node)
